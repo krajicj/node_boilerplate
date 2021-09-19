@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler')
-const db = require('../model/models');
+const db = require('../model/model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -7,11 +7,10 @@ const bcrypt = require('bcryptjs');
 // @route     POST /api/v1/auth/register
 // @access    Public
 exports.register = asyncHandler(async (req, res, next) => {
-    //Check if user dont exist
-    console.log(req.body);
+    //Check if user does not exist
     const userExist = await db.User.findOne({ where: { email: req.body.email } });
     if (userExist) {
-        return res.status(400).send("User allready exist");
+        return res.status(400).send("User already exist");
     }
 
     //Hash the password
@@ -25,7 +24,7 @@ exports.register = asyncHandler(async (req, res, next) => {
             password: hashedPassowrd
         });
 
-        res.send(`Successfly added user ${user.email}`);
+        res.send(`Successfully added user ${user.email}`);
     } catch (err) {
         res.status(400).send(err);
     }
@@ -35,7 +34,7 @@ exports.register = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/auth/login
 // @access    Public
 exports.login = asyncHandler(async (req, res, next) => {
-    //Check if user dont exist
+    //Check if user exist
     const user = await db.User.findOne({ where: { email: req.body.email } });
     if (!user) {
         return res.status(401).send("Wrong username or password");
@@ -56,4 +55,3 @@ exports.login = asyncHandler(async (req, res, next) => {
     const token = jwt.sign({ id: user.id, iat: now, exp: exp }, process.env.TOKEN_SECRET);
     res.header("auth-token", token).send(token);
 });
-
